@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/abhinavnandekar27/complaint-registration-portal.git'
+            }
+        }
+        stage('Run TruffleHog') {
+            steps {
+                script {
+                    def result = sh(script: "trufflehog --json . | tee trufflehog_results.json", returnStatus: true)
+                    if (result != 0) {
+                        error("Secrets detected! Build failed.")
+                    }
+                }
+            }
+        }
+    }
+}
